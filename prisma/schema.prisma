@@ -1,0 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = env("DATABASE_PROVIDER") == "postgresql" ? "postgresql" : "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Subscriber {
+  id          Int       @id @default(autoincrement())
+  email       String    @unique
+  status      SubscriberStatus @default(PENDING)
+  token       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  confirmedAt DateTime?
+}
+
+enum SubscriberStatus {
+  PENDING
+  CONFIRMED
+}
+
+model ContactMessage {
+  id           Int      @id @default(autoincrement())
+  name         String
+  email        String
+  company      String?
+  message      String
+  utmSource    String?
+  utmMedium    String?
+  utmCampaign  String?
+  referer      String?
+  userAgent    String?
+  ip           String?
+  createdAt    DateTime @default(now())
+}
+
+model EventLog {
+  id         Int      @id @default(autoincrement())
+  sessionId  String
+  eventName  String
+  path       String?
+  userAgent  String?
+  ip         String?
+  createdAt  DateTime @default(now())
+
+  @@index([sessionId])
+  @@index([eventName])
+  @@index([createdAt])
+}
